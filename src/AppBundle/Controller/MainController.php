@@ -24,7 +24,6 @@ class MainController extends Controller
      */
     public function indexAction(Request $request)
     {
-        // replace this example code with whatever you need
         return $this->render('default/index.html.twig');
     }
 
@@ -56,8 +55,6 @@ class MainController extends Controller
      */
     public function extractMessageAction(Request $request, ChatExtractor $chatExtractor)
     {
-        $em = $this->getDoctrine()->getManager();
-
         $chatId = $request->request->get('chatId');
         $filePath = "uploads/{$chatId }.txt";
         $file = new \SplFileObject($filePath);
@@ -86,11 +83,7 @@ class MainController extends Controller
         $chatId = $request->request->get('chatId');
         $repository = $this->getDoctrine()->getRepository(Message::class);
 
-        $messages = $repository->findBy(
-            array('chatId' => $chatId),
-            array('sendDate' => 'ASC'),
-            100
-        );
+        $messages = $repository->getFirstX($chatId, 100);
 
         // serialize the messages to json
         $encoders = array(new JsonEncoder());
@@ -112,25 +105,8 @@ class MainController extends Controller
         $searchTerm = $request->request->get('searchTerm');
         $repository = $this->getDoctrine()->getRepository(Message::class);
 
-        $messages = $repository->createQueryBuilder('m')
-           ->where('m.chatId = :chatId')
-           ->andWhere('m.message LIKE :searchTerm')
-           ->setParameter('chatId', $chatId)
-           ->setParameter('searchTerm', "%{$searchTerm}%")
-           ->setFirstResult(0)
-           ->setMaxResults(200)
-           ->getQuery()
-           ->getResult();
-
-        $counts = $repository->createQueryBuilder('m')
-            ->select('m.sender as sender, count(m) as msgCount')
-            ->where('m.chatId = :chatId')
-            ->andWhere('m.message LIKE :searchTerm')
-            ->setParameter('chatId', $chatId)
-            ->setParameter('searchTerm', "%{$searchTerm}%")
-            ->groupBy('m.sender')
-            ->getQuery()
-            ->getResult();
+        $messages = $repository->getFirstXContaining($chatId, $searchTerm, 200);
+        $counts = $repository->countAllContaining($chatId, $searchTerm);
 
         // serialize the messages to json
         $encoders = array(new JsonEncoder());
@@ -151,14 +127,8 @@ class MainController extends Controller
         $chatId = $request->request->get('chatId');
         $repository = $this->getDoctrine()->getRepository(Message::class);
 
-        $stats = $repository->createQueryBuilder('m')
-            ->select('m.sender as sender, count(m) as msgCount')
-            ->where('m.chatId = :chatId')
-            ->setParameter('chatId', $chatId)
-            ->groupBy('m.sender')
-            ->getQuery()
-            ->getResult();
+        $countsBySender = $repository->countAllGroupedBySender($chatId);
 
-        return $this->json(array('data' => $stats));
+        return $this->json(array('data' => $countsBySender));
     }
 }
