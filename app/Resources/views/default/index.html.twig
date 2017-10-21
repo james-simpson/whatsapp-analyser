@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+	<!-- Modal -->
+	<div class="modal fade" id="modal" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">					
+					<h4 class="modal-title">Who are you?</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+					    <label for="selChatMember">Which of the chat members is you?</label>
+					    <select class="form-control" id="selChatMember"></select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>		  
+		</div>
+	</div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="sidebar sidebar-left col-sm-3">
+                <input type="hidden" id="chatId" value="f536ed66df8c58a07b507394357627d2">
+                <form id="frmLoadChat" class="chat-form" action="upload" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="importFile">Load the chat file to analyse:</label>
+                        <input type="file" class="form-control-file file-input" id="importFile" name="chatFile" aria-describedby="fileHelp">
+                    </div>
+                    <div id="importStatus"></div>
+                </form>
+                <form id="frmSearchMessages" class="chat-form" action="/searchMessages">
+                    <div class="form-group">
+                        <label for="searchTerm">Enter a search word or phrase:</label>
+                        <div class="emoji-picker-container">
+                            <input type="text" class="form-control" id="searchTerm" placeholder="Word/phrase to search for" data-emojiable="true">
+                        </div>
+                    </div>
+                    <button id="btnSearch" type="submit" class="btn btn-primary">
+                        <div id="btnSearchText" class="buttonText">Search</div>
+                    </button>
+                </form>
+                <div id="chatMembers" style="display:none;">
+                    <label>Chat members</label>
+                    <div id="ulChatMembers"></div>
+                </div> 
+            </div>
+            <div class="main col-sm-6">
+                <div id="chatPreview"></div>
+            </div>
+            <div class="sidebar sidebar-right col-sm-3">
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/chat-analyser.css') }}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ asset('css/emoji.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/jquery-3.2.1.min.js') }}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{{ asset('js/moment.js') }}"></script>
+    <script src="{{ asset('js/emoji-picker-config.js') }}"></script>
+    <script src="{{ asset('js/emoji-picker-util.js') }}"></script>
+    <script src="{{ asset('js/jquery.emojiarea.js') }}"></script>
+    <script src="{{ asset('js/emoji-picker.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+    <script src="{{ asset('js/chat.js') }}"></script>
+{% endblock %}
