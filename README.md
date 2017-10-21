@@ -1,4 +1,4 @@
-my_new_project
+WhatsApp Analyser
 ==============
 
-A Symfony project created on September 8, 2017, 7:12 pm.
+A website for searching and analysing exported WhatsApp chat files. Built using the Symfony PHP web framework and Javascript.
