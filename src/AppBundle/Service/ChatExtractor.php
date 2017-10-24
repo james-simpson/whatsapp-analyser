@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use AppBundle\Entity\Message;
 
+
 class ChatExtractor
 {
     // entity manager
@@ -20,9 +21,8 @@ class ChatExtractor
         $this->logger = $logger;
     }
 
-    public function extractMessages(\SplFileObject &$file, string $chatId)
+    public function extractMessages(\SplFileObject &$file, string $chatId, int $batchSize)
     {
-        $batchSize = 1000;
 
         $lineNo = 0;
         while (!$file->eof()) {
@@ -41,7 +41,7 @@ class ChatExtractor
                 try {
                     $message = $this->getMessageFromLine($line, $chatId);
                 } catch (\Throwable $t) {
-                    $this->logger->info("Could not parse line to message: " . $line);
+                    $this->logger->info("Could not parse message from line: " . $line);
                     continue;
                 }
 

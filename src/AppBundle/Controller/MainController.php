@@ -61,7 +61,7 @@ class MainController extends Controller
 
         try {
             // extract the messages from the uploaded file and save them to the DB
-            $chatExtractor->extractMessages($file, $chatId);
+            $chatExtractor->extractMessages($file, $chatId, 1000);
         } catch (Throwable $t) {
             $this->get('logger')->info("Could not extract message from chat file {$chatId}");
             unlink($filePath);
