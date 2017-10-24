@@ -132,7 +132,7 @@ class ChatExtractorTest extends TestCase
     /**
      * @test
      * Tests that for a file that contains 6 valid lines, when extractMessages
-     * called with a batch size of 5, verify that all the messages are parsed
+     * called with a batch size of 5, all the messages are parsed
      * and persisted. Also verify thatthey are persisted in two batches, 
      * one of 5 and one for the remaining message.
      */

@@ -29,29 +29,25 @@ class ChatExtractor
             $line = $file->fgets();
             $lineNo++;
 
-            if (strlen($line) > 1) {
+            // skip the line if it has less than two colons
+            // as this usually means it's not a real message
+            // e.g. someone changed the group name
+            if (substr_count($line, ":") < 2) {
+                continue;
+            }
 
-                // skip the line if it has less than two colons
-                // as this usually means it's not a real message
-                // e.g. someone changed the group name
-                if (substr_count($line, ":") < 2) {
-                    continue;
-                }
+            try {
+                $message = $this->getMessageFromLine($line, $chatId);
+            } catch (\Throwable $t) {
+                $this->logger->info("Could not parse message from line: " . $line);
+                continue;
+            }
 
-                try {
-                    $message = $this->getMessageFromLine($line, $chatId);
-                } catch (\Throwable $t) {
-                    $this->logger->info("Could not parse message from line: " . $line);
-                    continue;
-                }
+            $this->em->persist($message);
 
-                $this->em->persist($message);
-
-                if ($lineNo % $batchSize == 0) {
-                    // end of batch so save to the DB
-                    $this->em->flush();
-                }
-                
+            if ($lineNo % $batchSize == 0) {
+                // end of batch so save to the DB
+                $this->em->flush();
             }
         }
 
