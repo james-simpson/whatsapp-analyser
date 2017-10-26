@@ -35,6 +35,27 @@
     margin-top: 20px;
 }
 
+.main-modal {
+    background-color: #f5f5f5;
+}
+
+.small-modal-header {
+    padding-top: 10px;
+    padding-bottom: 5px;
+    border: none;
+}
+
+.small-modal-body {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: none;
+}
+
+.small-modal-footer {
+    padding-top: 0px;
+    border: none;
+}
+
 .btn:focus {
   outline: none;
 }

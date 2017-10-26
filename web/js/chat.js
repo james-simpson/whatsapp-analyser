@@ -24,6 +24,7 @@ $(document).ready(function(){
     });
 
     var groupChat = false;
+    var senderToShowAsMe;
 
     $('#frmLoadChat').submit(function(e){
         e.preventDefault();
@@ -32,6 +33,7 @@ $(document).ready(function(){
         $('#chatPreview').empty();
         $('#results').empty();
         $('#ulChatMembers').empty();
+        $('#selChatMember').empty();
 
         var formData = new FormData();    
         formData.append('chatFile', document.getElementById('importFile').files[0], "test filename" );
@@ -50,7 +52,11 @@ $(document).ready(function(){
 
                 $.post( "extractMessages", { chatId: chatId }, function(response) {
                     $('#importStatus').text("Getting chat overview...");
-                    populateChatOverview(chatId);
+                    populateChatOverview(chatId, function() {
+                        // ask the user to say which chat member they are so we know 
+                        // which messages to display on the right hand side
+                        $('#modal').modal();
+                    });
                 });
             }
         });
@@ -106,7 +112,13 @@ $(document).ready(function(){
         });
     });
 
-    function populateChatOverview(chatId) {
+    $("#btnModalOk").click(function() {
+        // set the sender whose messages will be shown
+        // on the right hand side
+        senderToShowAsMe = $('#selChatMember').val();
+    });
+
+    function populateChatOverview(chatId, callback) {
         $.post( "chatOverview", { chatId: chatId }, function(response) {
             $('#importStatus').text("Chat loaded.");
             $('#importStatus').siblings().remove(".loader");
@@ -127,9 +139,7 @@ $(document).ready(function(){
                 groupChat = true;
             }
 
-            // ask the user to say which chat member they are so we know 
-            // which messages to display on the right hand side
-            $('#modal').modal();
+            callback();
         });
     }
 
@@ -162,8 +172,8 @@ $(document).ready(function(){
         var sendTime = moment(msg.sendDate.timestamp * 1000).format('h:mm A');
         msgElement.find('.msg').html(messageHtml + "<span class='message-time'>" + sendTime + "</span>");
 
-        // if it's the first message or the send date (but not necessarily time) is different,
-        // display the date before the message
+        // if it's the first message or the send date is different
+        // to that of the previous message, display the date before the message
         var sendDate = moment(msg.sendDate.timestamp * 1000).format('Do MMMM YYYY');
         if (previousMsg === null) {
             $('#chatPreview').append("<div class='message-date'>" + sendDate + "</div>");
@@ -175,7 +185,7 @@ $(document).ready(function(){
             }
         }
 
-        if (msg.sender === "James Simpson") {
+        if (msg.sender === senderToShowAsMe) {
             msgElement.find('.msg').addClass('msg-out');
         } else {
             msgElement.find('.msg').addClass('msg-in');
@@ -184,7 +194,7 @@ $(document).ready(function(){
         if (previousMsg === null || msg.sender !== previousMsg.sender || sendDate !== prevSendDate) {
             msgElement.find('.msg').addClass('first');
 
-            if (groupChat === true && msg.sender !== "James Simpson") {
+            if (groupChat === true && msg.sender !== senderToShowAsMe) {
                 msgElement.find('.msg').prepend("<span class='message-sender'>" + msg.sender + "</span>");
             }
         }
