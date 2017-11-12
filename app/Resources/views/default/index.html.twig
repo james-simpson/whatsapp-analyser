@@ -12,7 +12,9 @@
 				</div>
 				<div class="modal-body small-modal-body">
 					<div class="form-group">
-					    <select class="form-control" id="selChatMember"></select>
+					    <select class="form-control" id="selChatMember">
+                            <option v-for="member in chat.members" :value="member.name">{ member.name }</option>
+                        </select>
 					</div>
 				</div>
 				<div class="modal-footer small-modal-footer">
@@ -26,12 +28,22 @@
         <div class="row">
             <div class="sidebar sidebar-left col-sm-3">
                 <input type="hidden" id="chatId" value="f536ed66df8c58a07b507394357627d2">
-                <form id="frmLoadChat" class="chat-form" action="upload" method="POST" enctype="multipart/form-data">
+                <form
+                    id="frmLoadChat"
+                    class="chat-form"
+                    action="upload"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    @submit="uploadChatFile()"
+                >
                     <div class="form-group">
                         <label for="importFile">Load the chat file to analyse:</label>
                         <input type="file" class="form-control-file file-input" id="importFile" name="chatFile" aria-describedby="fileHelp">
                     </div>
-                    <div id="importStatus"></div>
+                    <div id="importStatus">
+                        <div class='loader' v-show="loading"></div>
+                        { message }
+                    </div>
                 </form>
                 <form id="frmSearchMessages" class="chat-form" action="/searchMessages">
                     <div class="form-group">
@@ -44,10 +56,14 @@
                         <div id="btnSearchText" class="buttonText">Search</div>
                     </button>
                 </form>
-                <div id="chatMembers" style="display:none;">
+                <div id="chatMembers" v-show="hasMembers()">
                     <label>Chat members</label>
-                    <div id="ulChatMembers"></div>
-                </div> 
+                    <ul id="ulChatMembers">
+                        <li v-for="member in chat.members">
+                            { member.name } ({ member.msgCount } messages)
+                        </li>
+                    </ul>
+                </div>
             </div>
             <div class="main col-sm-6">
                 <div id="chatPreview"></div>
@@ -76,4 +92,5 @@
     <script src="{{ asset('js/emoji-picker.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
     <script src="{{ asset('js/chat.js') }}"></script>
+    <script src="{{ asset('js/vue-test.js') }}"></script>
 {% endblock %}
