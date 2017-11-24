@@ -4,11 +4,11 @@
         <meta charset="UTF-8" />
         <title>{% block title %}Chat Analyser{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
-        <script src="https://unpkg.com/vue"></script>
+        {% block headerJavascripts %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        {% block bodyJavascripts %}{% endblock %}
     </body>
 </html>

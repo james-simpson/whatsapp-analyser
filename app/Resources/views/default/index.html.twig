@@ -18,7 +18,15 @@
 					</div>
 				</div>
 				<div class="modal-footer small-modal-footer">
-					<button type="button" id="btnModalOk" class="btn btn-primary" data-dismiss="modal">OK</button>
+					<button 
+                        type="button"
+                        id="btnModalOk"
+                        class="btn btn-primary"
+                        data-dismiss="modal"
+                        @click="chooseChatMember()"
+                    >
+                        OK
+                    </button>
 				</div>
 			</div>		  
 		</div>
@@ -27,7 +35,6 @@
     <div class="container-fluid">
         <div class="row">
             <div class="sidebar sidebar-left col-sm-3">
-                <input type="hidden" id="chatId" value="f536ed66df8c58a07b507394357627d2">
                 <form
                     id="frmLoadChat"
                     class="chat-form"
@@ -38,7 +45,14 @@
                 >
                     <div class="form-group">
                         <label for="importFile">Load the chat file to analyse:</label>
-                        <input type="file" class="form-control-file file-input" id="importFile" name="chatFile" aria-describedby="fileHelp">
+                        <input
+                            type="file"
+                            class="form-control-file file-input"
+                            id="importFile"
+                            name="chatFile"
+                            aria-describedby="fileHelp"
+                            v-on:change="chatFileChanged()"
+                        >
                     </div>
                     <div id="importStatus">
                         <div class='loader' v-show="loading"></div>
@@ -82,15 +96,19 @@
     <link rel="stylesheet" href="{{ asset('css/emoji.css') }}">
 {% endblock %}
 
-{% block javascripts %}
+{% block headerJavascripts %}
+    <script src="https://unpkg.com/vue"></script>
+{% endblock %}
+
+{% block bodyJavascripts %}
     <script src="{{ asset('js/jquery-3.2.1.min.js') }}"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('js/moment.js') }}"></script>
     <script src="{{ asset('js/emoji-picker-config.js') }}"></script>
     <script src="{{ asset('js/emoji-picker-util.js') }}"></script>
     <script src="{{ asset('js/jquery.emojiarea.js') }}"></script>
     <script src="{{ asset('js/emoji-picker.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+    <script src="{{ asset('js/chart.min.js') }}"></script>
     <script src="{{ asset('js/chat.js') }}"></script>
     <script src="{{ asset('js/vue-test.js') }}"></script>
 {% endblock %}
