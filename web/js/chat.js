@@ -1,5 +1,3 @@
-var senderToShowAsMe;
-
 $(document).ready(function(){
 
     // Initializes and creates emoji set from sprite sheet
@@ -11,12 +9,6 @@ $(document).ready(function(){
     });
 
     window.emojiPicker.discover();
-
-    $('#importFile').change(function(){
-        if ($(this).val() !== "") {
-            fileImport.uploadChatFile();
-        }
-    });
 
     $('.emoji-wysiwyg-editor').keypress(function(e) {
         if (e.which == 13) {
@@ -39,7 +31,7 @@ $(document).ready(function(){
         $('#chatPreview').append("<div class='loadingText lead'>Searching messages...</div>");
 
         var searchTerm = $('#searchTerm').val();
-        $.post("searchMessages", {chatId: chat.id, searchTerm: searchTerm}, function(response) {
+        $.post("searchMessages", { chatId: chat.id, searchTerm: searchTerm }, function(response) {
 
             $('#chatPreview').find('.loadingText').remove();
 
@@ -65,7 +57,6 @@ $(document).ready(function(){
                 }
 
                 var msgElement = formatMsgElement(msg, previousMsg, searchTerm, searchTermContainsEmoji) ;
-
                 $('#chatPreview').append(msgElement);
             };
 
@@ -73,12 +64,6 @@ $(document).ready(function(){
             $('#btnSearch > div').remove(".loader");
             $('#btnSearch').removeClass("disabled");
         });
-    });
-
-    $("#btnModalOk").click(function() {
-        // set the sender whose messages will be shown
-        // on the right hand side
-        senderToShowAsMe = $('#selChatMember').val();
     });
 });
 
@@ -124,7 +109,7 @@ function formatMsgElement(msg, previousMsg, searchTerm, searchTermContainsEmoji)
         }
     }
 
-    if (msg.sender === senderToShowAsMe) {
+    if (msg.sender === chat.senderToShowAsMe) {
         msgElement.find('.msg').addClass('msg-out');
     } else {
         msgElement.find('.msg').addClass('msg-in');
@@ -133,7 +118,7 @@ function formatMsgElement(msg, previousMsg, searchTerm, searchTermContainsEmoji)
     if (previousMsg === null || msg.sender !== previousMsg.sender || sendDate !== prevSendDate) {
         msgElement.find('.msg').addClass('first');
 
-        if (chat.isGroupChat() && msg.sender !== senderToShowAsMe) {
+        if (chat.isGroupChat() && msg.sender !== chat.senderToShowAsMe) {
             msgElement.find('.msg').prepend("<span class='message-sender'>" + msg.sender + "</span>");
         }
     }
