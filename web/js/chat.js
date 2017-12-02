@@ -19,51 +19,7 @@ $(document).ready(function(){
 
     $('#frmSearchMessages').submit(function(e){
         e.preventDefault();
-
-        $('#btnSearch').blur();
-        $('#btnSearchText').text("Searching messages...");
-        $('#btnSearch').prepend("<div class='loader'></div>");
-        $('#btnSearch').addClass("disabled");
-        $('#results').empty();
-        $(".sidebar-right").animate({width:'0'}, 350);
-        $('#chatPreview').empty();
-
-        $('#chatPreview').append("<div class='loadingText lead'>Searching messages...</div>");
-
-        var searchTerm = $('#searchTerm').val();
-        $.post("searchMessages", { chatId: chat.id, searchTerm: searchTerm }, function(response) {
-
-            $('#chatPreview').find('.loadingText').remove();
-
-            var messages = JSON.parse(response.messages);
-            displaySearchCounts(response.counts, searchTerm)
-
-            if (messages.length === 0) {
-                $('#chatPreview').append("<div class='no-messages lead'>No matching messages</div>");
-            }
-
-            var searchTermContainsEmoji = false;
-            for (var key in Config.Emoji) {
-                if (searchTerm.includes(Config.Emoji[key][0])) {
-                    searchTermContainsEmoji = true;
-                }
-            }
-
-            var previousMsg = null;
-            for (var i = 0; i < messages.length; i++) {
-                msg = messages[i];
-                if (i > 0) {
-                    previousMsg = messages[i - 1];
-                }
-
-                var msgElement = formatMsgElement(msg, previousMsg, searchTerm, searchTermContainsEmoji) ;
-                $('#chatPreview').append(msgElement);
-            };
-
-            $('#btnSearchText').text("Search");
-            $('#btnSearch > div').remove(".loader");
-            $('#btnSearch').removeClass("disabled");
-        });
+        searchForm.search();
     });
 });
 
@@ -100,11 +56,11 @@ function formatMsgElement(msg, previousMsg, searchTerm, searchTermContainsEmoji)
     // to that of the previous message, display the date before the message
     var sendDate = moment(msg.sendDate.timestamp * 1000).format('Do MMMM YYYY');
     if (previousMsg === null) {
-        $('#chatPreview').append("<div class='message-date'>" + sendDate + "</div>");
+        $('#messages').append("<div class='message-date'>" + sendDate + "</div>");
     } else {
         var prevSendDate = moment(previousMsg.sendDate.timestamp * 1000).format('Do MMMM YYYY');
         if (sendDate !== prevSendDate) {
-            $('#chatPreview').append("<div class='message-date'>" + sendDate + "</div>");
+            $('#messages').append("<div class='message-date'>" + sendDate + "</div>");
             msgElement.find('.msg').addClass('first');
         }
     }

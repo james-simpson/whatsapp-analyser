@@ -6,6 +6,10 @@ li {
     list-style: none;
 }
 
+[v-cloak] {
+  display: none;
+}
+
 .sidebar {
     position: fixed;
     top: 0;
@@ -39,8 +43,8 @@ li {
     margin-left: 25%
 }
 
-#chatPreview {
-    margin-top: 20px;
+#messages {
+    margin-top: 10px;
 }
 
 .main-modal {
@@ -172,9 +176,14 @@ li {
     font-size: 12px;
 }
 
-.message-date:not(:first-child) {
+.message-date {
     padding-top: 15px;
     padding-bottom: 5px;
+}
+
+.highlighted {
+    font-weight: bold;
+    font-style: italic;
 }
 
 .file-input {

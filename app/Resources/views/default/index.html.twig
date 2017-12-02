@@ -13,7 +13,7 @@
 				<div class="modal-body small-modal-body">
 					<div class="form-group">
 					    <select class="form-control" id="selChatMember">
-                            <option v-for="member in chat.members" :value="member.name">{ member.name }</option>
+                            <option v-for="member in chat.members" :value="member.name" v-cloak>{ member.name }</option>
                         </select>
 					</div>
 				</div>
@@ -54,7 +54,7 @@
                             v-on:change="chatFileChanged()"
                         >
                     </div>
-                    <div id="importStatus">
+                    <div id="importStatus" v-cloak>
                         <div class='loader' v-show="loading"></div>
                         { message }
                     </div>
@@ -66,11 +66,14 @@
                             <input type="text" class="form-control" id="searchTerm" placeholder="Word/phrase to search for" data-emojiable="true">
                         </div>
                     </div>
-                    <button id="btnSearch" type="submit" class="btn btn-primary">
-                        <div id="btnSearchText" class="buttonText">Search</div>
+                    <button id="btnSearch" type="submit" class="btn btn-primary" v-bind:class="{ disabled: loading }" v-cloak>
+                        <div id="btnSearchText" class="buttonText">
+                            <div class='loader' v-show="loading"></div>
+                            { buttonText }
+                        </div>
                     </button>
                 </form>
-                <div id="chatMembers" v-show="hasMembers()">
+                <div id="chatMembers" v-show="hasMembers()" v-cloak>
                     <label>Chat members</label>
                     <ul id="ulChatMembers">
                         <li v-for="member in chat.members">
@@ -80,9 +83,19 @@
                 </div>
             </div>
             <div class="main col-sm-6">
-                <div id="chatPreview"></div>
+                <div id="messages">
+                    <div v-for="(message, index) in chat.messages" v-cloak>
+                        <message-item
+                            :msg="message"
+                            :previous-msg="chat.messages[index - 1]"
+                            :sender-to-show-as-me="chat.senderToShowAsMe"
+                            :search-term="searchTerm"
+                        >
+                        </message-item>
+                    </div>
+                </div>
             </div>
-            <div class="sidebar sidebar-right col-sm-3">
+            <div id="searchSummary" class="sidebar sidebar-right col-sm-3">
                 <div id="results"></div>
             </div>
         </div>

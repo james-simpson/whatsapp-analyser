@@ -59,8 +59,8 @@ var fileImport = new Vue({
 	delimiters: ['{', '}'],
 	data: {
 		chat: chat,
-	loading: false,
-	message: ""
+		loading: false,
+		message: ""
 	},
 	methods: {
 		chatFileChanged: function() {
@@ -70,9 +70,8 @@ var fileImport = new Vue({
 		},
 		uploadChatFile: function() {
 
-			var self = this;
-		    this.loading = true;
-		    this.message = "Uploading file...";
+		    fileImport.loading = true;
+		    fileImport.message = "Uploading file...";
 		    chat.clear();
 
 		    var formData = new FormData();    
@@ -95,7 +94,7 @@ var fileImport = new Vue({
 
 		    // parse the messages and save them to the DB
 			.then(function(result) {		
-		        self.message = "Extracting messages...";
+		        fileImport.message = "Extracting messages...";
 		        $.post("extractMessages", { chatId: chat.id }, function(response) {
 		            return result; 
 		        });
@@ -104,7 +103,7 @@ var fileImport = new Vue({
 			// display the chat details, i.e. names of chat members
 			// and no. of messages each member has sent
 			.then(function(result) {
-				self.message = "Getting chat overview...";
+				fileImport.message = "Getting chat overview...";
 				chat.getOverview(function() {
 					fileImport.loading = false;
 			    	fileImport.message = "Chat loaded.";
@@ -117,3 +116,129 @@ var fileImport = new Vue({
 		}
 	}
 })
+
+var searchForm = new Vue({
+	el: '#frmSearchMessages',
+	delimiters: ['{', '}'],
+	data: {
+		chat: chat,
+		loading: false,
+		buttonText: "Search"
+	},
+	methods: {
+		search: function() {
+
+			searchForm.loading = true;
+			searchForm.buttonText = "Searching messages...";
+			$('#btnSearch').blur();
+	        $('#results').empty();
+	 		searchSummary.slideOut();
+	        $('#messages').empty();
+	        $('#messages').append("<div class='loadingText lead'>Searching messages...</div>");
+
+	        chat.messages = [];
+
+	        var searchTerm = $('#searchTerm').val();
+	        messageList.searchTerm = searchTerm;
+	        $.post("searchMessages", { chatId: chat.id, searchTerm: searchTerm }, function(response) {
+
+	            $('#messages').find('.loadingText').remove();
+
+	            var messages = JSON.parse(response.messages);
+	            displaySearchCounts(response.counts, searchTerm)
+
+	            if (messages.length === 0) {
+	                $('#messages').append("<div class='no-messages lead'>No matching messages</div>");
+	            }
+
+	            var searchTermContainsEmoji = false;
+	            for (var key in Config.Emoji) {
+	                if (searchTerm.includes(Config.Emoji[key][0])) {
+	                    searchTermContainsEmoji = true;
+	                }
+	            }
+
+	            var previousMsg = null;
+	            for (var i = 0; i < messages.length; i++) {
+	                msg = messages[i];
+	                if (i > 0) {
+	                    previousMsg = messages[i - 1];
+	                }
+
+	                // var msgElement = formatMsgElement(msg, previousMsg, searchTerm, searchTermContainsEmoji) ;
+	                // $('#messages').append(msgElement);
+
+	                var sendDate = moment(msg.sendDate.timestamp * 1000).format('Do MMMM YYYY');
+	                var sendTime = moment(msg.sendDate.timestamp * 1000).format('h:mm A');
+	                chat.messages.push(
+	                	{
+	                		sender: msg.sender,
+	                		text: msg.message,
+	                		date: sendDate,
+	                		time: sendTime
+	                	}
+	                )
+	            };
+
+	            searchForm.buttonText = "Search";
+	            searchForm.loading = false;
+	        });
+		}
+	}
+});
+
+var searchSummary = new Vue({
+	el: '#searchSummary',
+	delimiters: ['{', '}'],
+	data: {
+		chat: chat
+	},
+	methods: {
+		slideOut: function() {
+			$(".sidebar-right").animate({width:'0'}, 350);
+		}
+	}
+});
+
+// register
+Vue.component('message-item', {
+  delimiters: ['{', '}'],
+  template: `<div>
+  				<div class="message-date" v-show="showDate">{ msg.date }</div>
+                <div class="msg-container">
+                    <div 
+                        class="msg"
+                        v-bind:class="{'msg-out': isMessageOut, 'msg-in': !isMessageOut, 'first': firstClass}"
+                        v-html="messageTextHtml"
+                    >
+                        <span class="message-time">{ msg.time }</span>
+                    </div>
+                </div>
+            </div>`,
+    props: ['msg', 'previousMsg', 'searchTerm', 'senderToShowAsMe'],
+    computed: {
+    	showDate: function() {
+    		return typeof this.previousMsg === 'undefined' || this.msg.date !== this.previousMsg.date;
+    	},
+		firstClass: function() {			
+			return this.showDate || this.msg.sender !== this.previousMsg.sender;
+		},
+		isMessageOut: function() {
+			// console.log(this.msg)
+			return this.msg.sender === this.senderToShowAsMe;
+		},
+		messageTextHtml: function() {
+			var regex = new RegExp("(" + preg_quote(this.searchTerm) + ")", 'gi');
+        	return this.msg.text.replace(regex, "<span class='highlighted'>$1</span>");
+		}
+    }
+})
+
+var messageList = new Vue({
+	el: '#messages',
+	delimiters: ['{', '}'],
+	data: {
+		chat: chat,
+		searchTerm: ""
+	}
+});
